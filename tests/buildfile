@@ -1,0 +1,4 @@
+import libs = glfw%lib{glfw}
+import libs += glbinding%lib{glbinding}
+
+./: exe{main}: cxx{main} $libs
