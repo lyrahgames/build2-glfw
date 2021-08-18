@@ -1,47 +1,42 @@
-../upstream/src/
+./: lib{glfw}: \
+  include/h{**} \
+  src/h{internal mappings} \
+  src/c{context init input monitor vulkan window}
 {
-  ./: ../doc{README.md LICENSE.md}
-
-  ./: lib{glfw}: \
-    ../include/h{**} \
-    h{internal mappings} \
-    c{context init input monitor vulkan window}
-  {
-    c.export.poptions =+ "-I$src_root/upstream/include"
-  }
-
-  lib{glfw}: $src_root/glfw/h{glfw_config}
-  c.poptions =+ "-I$src_root/upstream/include" "-I$src_root/glfw"
-  c.poptions += -D_GLFW_USE_CONFIG_H=1
-  c.coptions += -fPIC
-  c.libs += -lrt -lm -ldl
-
-  import libs = xrandr%lib{xrandr}
-  import libs += xinerama%lib{xinerama}
-  import libs += xkbcommon-x11%lib{xkbcommon-x11}
-  import libs += xcursor%lib{xcursor}
-  import libs += xi%lib{xi}
-  import libs += pthread%lib{pthread}
-
-  lib{glfw}: \
-    {h c}{\
-      xkb_unicode posix_time \
-      posix_thread glx_context \
-      egl_context osmesa_context \
-      linux_joystick \
-    } \
-    h{x11_platform} \
-    c{x11_init x11_monitor x11_window} \
-    $libs
-
-  objs{*}:
-  {
-    c.poptions += -D_GLFW_BUILD_DLL=1
-    c.coptions += -fvisibility=hidden
-  }
-
-  h{*}: install = false
-  ../include/h{*}: install.subdirs = true
+  c.export.poptions =+ "-I$src_base/include"
 }
 
-h{*}: install = false
+lib{glfw}: h{glfw_config}
+
+c.poptions =+ "-I$src_base/include" "-I$src_base"
+c.poptions += -D_GLFW_USE_CONFIG_H=1
+c.coptions += -fPIC
+c.libs += -lrt -lm -ldl
+
+import libs = xrandr%lib{xrandr}
+import libs += xinerama%lib{xinerama}
+import libs += xkbcommon-x11%lib{xkbcommon-x11}
+import libs += xcursor%lib{xcursor}
+import libs += xi%lib{xi}
+import libs += pthread%lib{pthread}
+
+lib{glfw}: \
+  src/{h c}{\
+    xkb_unicode posix_time \
+    posix_thread glx_context \
+    egl_context osmesa_context \
+    linux_joystick \
+  } \
+  src/h{x11_platform} \
+  src/c{x11_init x11_monitor x11_window} \
+  $libs
+
+objs{*}:
+{
+  c.poptions += -D_GLFW_BUILD_DLL=1
+  c.coptions += -fvisibility=hidden
+}
+
+h{glfw_config}@./: install = false
+src/h{*}: install = false
+include/h{*}: install.subdirs = true

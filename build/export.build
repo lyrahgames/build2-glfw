@@ -3,4 +3,4 @@ $out_root/
   include glfw/
 }
 
-export $out_root/upstream/src/$import.target
+export $out_root/glfw/$import.target

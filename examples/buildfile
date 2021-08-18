@@ -1,0 +1,16 @@
+import glfw = glfw%lib{glfw}
+
+include ../external/
+
+c.poptions =+ "-I$src_base/../external/deps"
+c.libs += -lm -pthread
+
+for t: c{*}
+{
+  n = $name($t)
+  ./: exe{$n}: $t $glfw ../external/libue{glad_gl}: bin.whole = false
+}
+
+exe{particles}: ../external/libue{tinycthread} ../external/libue{getopt}
+
+exe{offscreen}: test = true

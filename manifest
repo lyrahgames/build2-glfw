@@ -4,15 +4,14 @@ version: 3.3.2
 summary: Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development
 license: Zlib ; The zlib/libpng License
 
-description-file: upstream/README.md
+description-file: UPSTREAM.README.md
 url: https://www.glfw.org/
 src-url: https://github.com/glfw/glfw
 package-url: https://github.com/lyrahgames/build2-glfw
-# email:
-package-email: markus.pawellek@mailbox.org
+package-email: lyrahgames@mailbox.org
 
-depends: * build2 >= 0.12.0
-depends: * build2 >= 0.12.0
+depends: * build2 >= 0.13.0
+depends: * build2 >= 0.13.0
 
 requires: linux
 requires: gcc | clang
@@ -25,5 +24,3 @@ requires: xinerama
 requires: xkbcommon-x11
 requires: xcursor
 requires: xi
-
-# requires: ? glbinding ; if building the tests
