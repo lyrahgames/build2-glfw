@@ -23,12 +23,19 @@ lib{glfw}: \
 # Windows Headers and Sources
 lib{glfw}: \
   src/{h c}{win32_joystick wgl_context \
-            egl_context \
-            osmesa_context} \
+            egl_context osmesa_context} \
   src/h{win32_platform} \
   src/c{win32_init win32_monitor win32_time \
         win32_thread win32_window}: \
     include = ($c.target.class == 'windows')
+
+# MacOS Headers and Sources
+lib{glfw}: \
+  src/h{cocoa_platform cocoa_joystick posix_thread \
+        nsgl_context egl_context osmesa_context} \
+  src/c{cocoa_time posix_thread \
+        egl_context osmesa_context}: \
+    include = ($c.target.class == 'macos')
 
 # Platform-Dependent Configuration
 c.poptions =+ "-I$src_base/include"
@@ -43,6 +50,15 @@ if ($c.target.class == 'linux')
   import libs += pthread%lib{pthread}
   objs{*}: c.coptions += -fvisibility=hidden
   lib{glfw}: $libs
+}
+elif ($c.target.class == 'macos')
+{
+  c.poptions += -D_GLFW_COCOA=1
+  c.libs += \
+    -framework Cocoa \
+    -framework IOKit \
+    -framework CoreFoundation
+  objs{*}: c.coptions += -fno-common -fvisibility=hidden
 }
 elif ($c.target.class == 'windows')
 {
@@ -68,6 +84,36 @@ elif ($c.target.class == 'windows')
     c.libs += -lgdi32
     objs{*}: c.loptions += -static-libgcc
   }
+}
+
+
+define cobj: file
+cobj{*}: extension = m
+# cobj_files = cocoa_init cocoa_joystick cocoa_monitor \
+#              cocoa_window nsgl_context
+define cobja: obja
+cobja{*}: extension = a.o
+define cobjs: objs
+cobjs{*}: extension = so.o
+
+for t: src/cobj{*}
+{
+  n = $name($t)
+
+  liba{glfw}: src/cobja{$n}: include = ($c.target.class == 'macos')
+  libs{glfw}: src/cobjs{$n}: include = ($c.target.class == 'macos')
+
+  src/cobja{$n}: $t
+  {{
+    diag c ($<)
+    $c.path $cc.poptions $c.poptions $cc.coptions $c.coptions $c.mode -o $path($>) -c -x objective-c $path($<)
+  }}
+
+  src/cobjs{$n}: $t
+  {{
+    diag c ($<)
+    $c.path $cc.poptions $c.poptions $cc.coptions $c.coptions $c.mode -o $path($>) -c -x objective-c $path($<)
+  }}
 }
 
 # Header Installation
