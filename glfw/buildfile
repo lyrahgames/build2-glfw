@@ -48,14 +48,24 @@ elif ($c.target.class == 'windows')
 {
   c.poptions += -D_GLFW_WIN32=1
   c.poptions += -D_UNICODE
-  c.libs += -lgdi32
   libs{glfw}: c.export.poptions += -DGLFW_DLL
 
-  if ($c.target.system == 'mingw32')
+  if ($c.id == 'msvc')
+  {
+    # Assume, 'dinput.h' exists.
+    c.poptions += /D_CRT_SECURE_NO_WARNINGS
+    c.libs += gdi32.lib
+  }
+  elif ($c.id == 'clang')
+  {
+    c.libs += gdi32.lib
+  }
+  elif ($c.target.system == 'mingw32')
   {
     # Assume, 'dinput.h' and 'xinput.h' exist.
     c.poptions += -DWINVER=0x0501
     c.loptions += -Wl,--nxcompat -Wl,--dynamicbase -Wl,--high-entropy-va
+    c.libs += -lgdi32
     objs{*}: c.loptions += -static-libgcc
   }
 }

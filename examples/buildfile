@@ -3,7 +3,11 @@ import glfw = glfw%lib{glfw}
 include ../external/
 
 c.poptions =+ "-I$src_base/../external/deps"
-c.libs += -lm -pthread
+
+if ($c.target.class == 'linux')
+{
+  c.libs += -lm -pthread
+}
 
 for t: c{*}
 {

@@ -14,6 +14,7 @@ depends: * build2 >= 0.13.0
 depends: * build2 >= 0.13.0
 
 requires: linux | windows
-requires: gcc | clang | mingw
+requires: gcc | clang | mingw | msvc
 requires: ? x11; ($cxx.target.system == 'linux')
 requires: ? pthreads; ($cxx.target.system == 'linux')
+requires: ? gdi32; ($cxx.target.system == 'windows')
