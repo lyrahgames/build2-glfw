@@ -16,4 +16,4 @@ for t: c{*}
   ./: exe{$n}: $t $glfw $libs: bin.whole = false
 }
 
-exe{glfwinfo}: test = true
+# exe{glfwinfo}: test = true
