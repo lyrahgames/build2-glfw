@@ -13,4 +13,5 @@ for t: c{*}
 
 exe{particles}: ../external/libue{tinycthread} ../external/libue{getopt}
 
-exe{offscreen}: test = true
+# exe{offscreen}: test = true
+exe{*}: test = true

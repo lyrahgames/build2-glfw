@@ -1,42 +1,65 @@
-./: lib{glfw}: \
+./: lib{glfw}
+
+# Common Sources
+lib{glfw}: \
   include/h{**} \
   src/h{internal mappings} \
   src/c{context init input monitor vulkan window}
-{
-  c.export.poptions =+ "-I$src_base/include"
-}
 
-lib{glfw}: h{glfw_config}
+# We not use the config file.
+# lib{glfw}: h{glfw_config}
+# c.poptions += -D_GLFW_USE_CONFIG_H=1
+# h{glfw_config}@./: install = false
 
-c.poptions =+ "-I$src_base/include" "-I$src_base"
-c.poptions += -D_GLFW_USE_CONFIG_H=1
-c.coptions += -fPIC
-c.libs += -lrt -lm -ldl
-
-import libs = xrandr%lib{xrandr}
-import libs += xinerama%lib{xinerama}
-import libs += xkbcommon-x11%lib{xkbcommon-x11}
-import libs += xcursor%lib{xcursor}
-import libs += xi%lib{xi}
-import libs += pthread%lib{pthread}
-
+# Linux Headers and Sources
 lib{glfw}: \
-  src/{h c}{\
-    xkb_unicode posix_time \
-    posix_thread glx_context \
-    egl_context osmesa_context \
-    linux_joystick \
-  } \
+  src/{h c}{xkb_unicode posix_time posix_thread \
+            glx_context egl_context osmesa_context \
+            linux_joystick} \
   src/h{x11_platform} \
-  src/c{x11_init x11_monitor x11_window} \
-  $libs
+  src/c{x11_init x11_monitor x11_window}: \
+    include = ($c.target.class == 'linux')
 
-objs{*}:
+# Windows Headers and Sources
+lib{glfw}: \
+  src/{h c}{win32_joystick wgl_context \
+            egl_context \
+            osmesa_context} \
+  src/h{win32_platform} \
+  src/c{win32_init win32_monitor win32_time \
+        win32_thread win32_window}: \
+    include = ($c.target.class == 'windows')
+
+# Platform-Dependent Configuration
+c.poptions =+ "-I$src_base/include"
+objs{*}: c.poptions += -D_GLFW_BUILD_DLL=1
+lib{glfw}: c.export.poptions = "-I$src_base/include"
+
+if ($c.target.class == 'linux')
 {
-  c.poptions += -D_GLFW_BUILD_DLL=1
-  c.coptions += -fvisibility=hidden
+  c.poptions += -D_GLFW_X11=1
+  c.libs += -lrt -lm -ldl
+  import libs = x11%lib{x11}
+  import libs += pthread%lib{pthread}
+  objs{*}: c.coptions += -fvisibility=hidden
+  lib{glfw}: $libs
+}
+elif ($c.target.class == 'windows')
+{
+  c.poptions += -D_GLFW_WIN32=1
+  c.poptions += -D_UNICODE
+  c.libs += -lgdi32
+  libs{glfw}: c.export.poptions += -DGLFW_DLL
+
+  if ($c.target.system == 'mingw32')
+  {
+    # Assume, 'dinput.h' and 'xinput.h' exist.
+    c.poptions += -DWINVER=0x0501
+    c.loptions += -Wl,--nxcompat -Wl,--dynamicbase -Wl,--high-entropy-va
+    objs{*}: c.loptions += -static-libgcc
+  }
 }
 
-h{glfw_config}@./: install = false
+# Header Installation
 src/h{*}: install = false
 include/h{*}: install.subdirs = true

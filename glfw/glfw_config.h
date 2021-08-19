@@ -1,1 +1,0 @@
-#define _GLFW_X11 1

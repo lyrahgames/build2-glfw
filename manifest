@@ -13,14 +13,7 @@ package-email: lyrahgames@mailbox.org
 depends: * build2 >= 0.13.0
 depends: * build2 >= 0.13.0
 
-requires: linux
-requires: gcc | clang
-requires: x11
-
-# X11 development libraries for Linux
-requires: pthreads
-requires: xrandr
-requires: xinerama
-requires: xkbcommon-x11
-requires: xcursor
-requires: xi
+requires: linux | windows
+requires: gcc | clang | mingw
+requires: ? x11; ($cxx.target.system == 'linux')
+requires: ? pthreads; ($cxx.target.system == 'linux')
