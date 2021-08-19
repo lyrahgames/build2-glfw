@@ -2,6 +2,9 @@
 !*/
 
 !upstream
+!glfw/include
+!glfw/src
+!external/deps
 
 !*.h
 !*.c
