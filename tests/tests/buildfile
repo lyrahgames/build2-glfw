@@ -1,0 +1,19 @@
+# include ../
+libs = \
+  ../libue{glad_gl} \
+  ../libue{glad_vulkan} \
+  ../libue{tinycthread} \
+  ../libue{getopt}
+
+if ($c.target.class == 'linux')
+{
+  c.libs += -lm -pthread
+}
+
+for t: c{*}
+{
+  n = $name($t)
+  ./: exe{$n}: $t $glfw $libs: bin.whole = false
+}
+
+# exe{glfwinfo}: test = true

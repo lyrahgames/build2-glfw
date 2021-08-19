@@ -1,23 +1,14 @@
 import glfw = glfw%lib{glfw}
 
-include ../external/
-libs = \
-  ../external/libue{glad_gl} \
-  ../external/libue{glad_vulkan} \
-  ../external/libue{tinycthread} \
-  ../external/libue{getopt}
+./: libue{glad_gl}: external/glad/h{gl} external/c{glad_gl}
+./: libue{glad_vulkan}: external/glad/h{vulkan} external/c{glad_vulkan}
+./: libue{tinycthread}: external/{h c}{tinycthread}
+./: libue{getopt}: external/{h c}{getopt}
 
-c.poptions =+ "-I$src_base/../external/deps"
+c.poptions =+ "-I$src_root/external"
 
-if ($c.target.class == 'linux')
-{
-  c.libs += -lm -pthread
-}
+# We do not want to provide libraries for every header.
+# This makes sure every header is available inside a dist package.
+./: external/h{**}
 
-for t: c{*}
-{
-  n = $name($t)
-  ./: exe{$n}: $t $glfw $libs: bin.whole = false
-}
-
-# exe{glfwinfo}: test = true
+./: tests/ examples/

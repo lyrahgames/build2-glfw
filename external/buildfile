@@ -1,9 +1,0 @@
-./: libue{glad_gl}: deps/glad/h{gl} deps/c{glad_gl}
-./: libue{glad_vulkan}: deps/glad/h{vulkan} deps/c{glad_vulkan}
-./: libue{tinycthread}: deps/{h c}{tinycthread}
-./: libue{getopt}: deps/{h c}{getopt}
-c.poptions =+ "-I$src_root/deps"
-
-# We do not want to provide libraries for every header.
-# This makes sure every header is available inside a dist package.
-./: deps/h{**}
